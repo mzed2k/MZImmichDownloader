@@ -199,3 +199,5 @@ LICENSE
 ## Haftungsausschluss
 
 Die Nutzung erfolgt auf eigenes Risiko. Vor produktiven Einsätzen wird ein Testlauf empfohlen.
+> [!IMPORTANT]
+> **Hinweis zur Entstehung:** Der Quellcode dieses Projekts wurde zu **99,9 % mit künstlicher Intelligenz generiert**, anschließend jedoch **von einem Menschen getestet**.
