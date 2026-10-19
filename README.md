@@ -1,2 +1,192 @@
 # MZImmichDownloader
-MZImmichDownloader is a lightweight Windows command-line utility for downloading original assets from Immich. It focuses on speed, reliability and unattended operation. Downloads are performed using curl, files are verified using metadata provided by the Immich API, and failed downloads are automatically retried during future runs.
+
+Fast command-line downloader for Immich.
+
+MZImmichDownloader downloads original assets directly from an Immich server and stores them in a chronological folder structure (`YYYY\MM`).
+
+Downloads are performed using `curl.exe`, allowing significantly higher performance than many traditional API downloaders or scripting approaches.
+
+## Features
+
+- High-speed downloads using `curl.exe`
+- Compatible with Immich API v3
+- Date-based folder structure (`YYYY\MM`)
+- Timestamped filenames
+- File integrity verification using `exifInfo.fileSizeInByte`
+- Automatic recovery from incomplete downloads
+- Removes corrupted or partial files
+- Duplicate asset protection
+- Configuration via INI file or command-line arguments
+- Configurable logging levels:
+  - SILENT
+  - NOTICE
+  - DEBUG
+- No external dependencies required
+
+## Motivation
+
+I need a simple way to download original files from an Immich server on Windows.
+
+Existing solutions were often either too complex, required additional software stacks, or did not fit well into automated backup workflows. I wanted a tool that could simply be copied onto a machine, configured once, and executed from a script or scheduled task.
+
+As a result, MZImmichDownloader was designed with the following goals:
+
+- One binary
+- No installation
+- Scriptable
+- Portable
+- Reliable
+- Fast
+
+If Windows can run the executable and access the Immich server, the tool should work.
+
+## Requirements
+
+- Windows
+- .NET Framework 4.x
+- `curl.exe` available in PATH
+- Immich server
+- Valid Immich API key
+
+## Configuration
+
+By default, the application looks for:
+
+```text
+MZImmichDownloader.ini
+```
+
+in the same directory as the executable.
+
+### Example Configuration
+
+```ini
+ImmichBaseUrl   = https://immich.example.com
+ApiKey          = YOUR_API_KEY
+OutputDir       = D:\ImmichBackup
+PageSize        = 100
+DownloadDays    = 14
+DateFilterMode  = created
+CheckFileSize   = true
+LogLevel        = NOTICE
+```
+
+## Command-Line Usage
+
+### Positional Parameters
+
+```cmd
+MZImmichDownloader.exe <ImmichBaseUrl> <ApiKey> <OutputDir> <PageSize>
+```
+
+Example:
+
+```cmd
+MZImmichDownloader.exe https://immich.local YOUR_API_KEY D:\Photos 200
+```
+
+### Options
+
+```text
+--debug
+--notice
+--silent
+--quiet
+
+--loglevel:DEBUG
+--loglevel:NOTICE
+--loglevel:SILENT
+
+--sizecheck:true
+--sizecheck:false
+
+--nosizecheck
+--no-sizecheck
+
+--help
+```
+
+### Examples
+
+Enable debug output:
+
+```cmd
+MZImmichDownloader.exe --debug
+```
+
+Disable file size verification:
+
+```cmd
+MZImmichDownloader.exe --nosizecheck
+```
+
+Run with full command-line configuration:
+
+```cmd
+MZImmichDownloader.exe https://immich.local YOUR_API_KEY D:\ImmichBackup 200 --debug
+
+```
+
+## Output Structure
+
+Example:
+
+```text
+D:\ImmichBackup
+ ├─ 2024
+ │   ├─ 01
+ │   ├─ 02
+ │   └─ 03
+ └─ 2025
+```
+
+Generated filenames:
+
+```text
+2025-08-14_17-52-31_IMG_1234.JPG
+```
+
+## Integrity Verification
+
+By default, downloaded files are verified against the file size reported by the Immich server (`exifInfo.fileSizeInByte`).
+
+If verification fails:
+
+- The file is considered invalid
+- The file is deleted
+- The asset will be downloaded again during the next run
+
+Verification can be disabled:
+
+```ini
+CheckFileSize=false
+```
+
+or
+
+```cmd
+--nosizecheck
+```
+
+## Compilation
+
+Visual Basic .NET 4.0:
+
+```cmd
+"%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\vbc.exe" ^
+ /target:exe ^
+ /out:MZImmichDownloader.exe ^
+ /reference:System.Web.Extensions.dll ^
+ /win32icon:mz-fimo-logo-blau.ico ^
+ MZImmichDownloader.vb AssemblyInfo.vb
+```
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
+
+See the LICENSE file for details.
+
+## Disclaimer
+
+This software is provided without any warranty. Always test in a non-production environment before relying on it for critical backups.
